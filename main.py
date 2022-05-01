@@ -13,11 +13,12 @@ def create_backup(file_path: str):
 def fetch_song_info(song) -> Song:
     ydl = yt_dlp.YoutubeDL()
     song_info = ydl.extract_info(song['url'], download=False)
-    song_info['path'] = song['path']
-    song_info['url'] = song['url']
-
     new_song = Song(song_info['id'], song_info)
-    return new_song
+    for _property in song:
+        if song[_property] is None:
+            song[_property] = new_song.to_dict()[_property]
+
+    return song
 
 def remake_cache(file_path: str):
     with open(file_path, 'r') as cache_json_file:
@@ -25,21 +26,25 @@ def remake_cache(file_path: str):
         for song in song_caches:
             for _property in song_caches[song]:
                 if song_caches[song][_property] is None:
-                    song_caches[song] = fetch_song_info(song_caches[song]).to_dict()
-        json_object = json.dumps(song_caches)
+                    song_caches[song] = fetch_song_info(song_caches[song])
+        song_json_object = json.dumps(song_caches)
     with open(file_path, 'w') as cache_json_file:
-        cache_json_file.write(json_object)
+        cache_json_file.write(song_json_object)
 
 
 if __name__ == "__main__":
     number_of_arguments = len(argv)
     if number_of_arguments == 2:
-        try:
-            file_path = argv[1]
-            create_backup(file_path)
-            remake_cache(file_path)
-            print('Cache successfully remade')
-        except:
-            print('Error to remake cache')
+        file_path = argv[1]
+        create_backup(file_path)
+        remake_cache(file_path)
+        print('Cache successfully remade')
+        # try:
+        #     file_path = argv[1]
+        #     create_backup(file_path)
+        #     remake_cache(file_path)
+        #     print('Cache successfully remade')
+        # except:
+        #     print('Error to remake cache')
     else:
         print('Invalid number of arguments')
