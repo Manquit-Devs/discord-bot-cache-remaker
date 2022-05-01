@@ -1,4 +1,5 @@
 
+from datetime import datetime
 import json
 from sys import argv
 from shutil import copyfile
@@ -8,7 +9,9 @@ from song import Song
 
 
 def create_backup(file_path: str):
-    copyfile(file_path, f'{file_path}.bkp')
+    now = datetime.now()
+    current_datetime = now.strftime("%y-%m-%d %H-%M-%S")
+    copyfile(file_path, f'{file_path}.{current_datetime}.bkp')
 
 
 def fetch_song_info(song) -> Song:
